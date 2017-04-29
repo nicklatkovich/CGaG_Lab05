@@ -63,8 +63,20 @@ namespace CGaG_Lab05 {
             float cos = (float)Math.Cos(MathHelper.ToRadians(v.Z));
             return v.X * new Vector3(
                 (float)Math.Cos(MathHelper.ToRadians(v.Y)) * cos,
-                (float)Math.Sin(MathHelper.ToRadians(v.Y)) * cos,
-                (float)Math.Sin(MathHelper.ToRadians(v.Z)));
+                (float)Math.Sin(MathHelper.ToRadians(v.Z)),
+                (float)Math.Sin(MathHelper.ToRadians(v.Y)) * cos);
+        }
+
+        public static void Median(ref float value, float min, float max) {
+            if (min > max) {
+                throw new Exception( );
+            }
+            if (value < min) {
+                value = min;
+            }
+            if (value > max) {
+                value = max;
+            }
         }
 
     }

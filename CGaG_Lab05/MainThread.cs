@@ -44,11 +44,11 @@ namespace CGaG_Lab05 {
                 new Color(0f, 0f, AxesLight),
             };
             {
-                float baseSize = 4f;
+                float baseSize = 3f;
                 float baseHeight = -2f;
                 float baseDx = baseSize * (float)Math.Cos(MathHelper.ToRadians(30f));
                 float baseDy = baseSize / 2f;
-                float topSize = 2f;
+                float topSize = 1.5f;
                 float topHeight = 2f;
                 float topDx = topSize * (float)Math.Cos(MathHelper.ToRadians(30f));
                 float topDy = topSize / 2f;
@@ -94,10 +94,21 @@ namespace CGaG_Lab05 {
         }
 
         protected override void Update(GameTime Time) {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState( ).IsKeyDown(Keys.Escape))
+
+            KeyboardState keyboard = Keyboard.GetState( );
+
+            if (keyboard.IsKeyDown(Keys.Escape)) {
                 Exit( );
+            }
 
             // TODO: Update logic
+            SphereCameraPosition.Y +=
+                (keyboard.IsKeyDown(Keys.Left) ? 1 : 0) -
+                (keyboard.IsKeyDown(Keys.Right) ? 1 : 0);
+            SphereCameraPosition.Z +=
+                (keyboard.IsKeyDown(Keys.Up) ? 1 : 0) -
+                (keyboard.IsKeyDown(Keys.Down) ? 1 : 0);
+            SimpleUtils.Median(ref SphereCameraPosition.Z, -89f, 89f);
             Effect.View = Matrix.CreateLookAt(SphereCameraPosition.SphereToCart( ), Vector3.Zero, Vector3.Up);
 
             base.Update(Time);
@@ -120,7 +131,8 @@ namespace CGaG_Lab05 {
                     new VertexPositionColor(new Vector3(0f, 0f, 1024f), AxesColors[2]),
                     new VertexPositionColor(new Vector3(0f, 0f, -1024f), AxesColors[2]),
                 });
-                this.DrawLineList(Points, Indices);}
+                this.DrawLineList(Points, Indices);
+            }
 
             base.Draw(Time);
         }
