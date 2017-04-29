@@ -8,9 +8,14 @@ namespace CGaG_Lab05 {
         GraphicsDeviceManager Graphics;
         SpriteBatch SpriteBatch;
 
-        Matrix WorldMatrix;
-        Matrix ViewMatrix;
-        Matrix ProjectionMatrix;
+        enum DrawingStyle {
+            Lines,
+            Edges,
+            ColorBases,
+            ColorFaces,
+        }
+        DrawingStyle Style = DrawingStyle.Edges;
+        
         BasicEffect Effect;
 
         float AxesLight = 0.7f;
@@ -29,6 +34,26 @@ namespace CGaG_Lab05 {
             3, 4,
             4, 5,
             5, 3,
+        };
+        Tuple<short, short, short>[ ] Faces = new Tuple<short, short, short>[ ] {
+            new Tuple<short, short, short>(0, 2, 1),
+            new Tuple<short, short, short>(0, 1, 3),
+            new Tuple<short, short, short>(1, 2, 5),
+            new Tuple<short, short, short>(2, 0, 3),
+            new Tuple<short, short, short>(3, 4, 5),
+        };
+        Tuple<short, short>[ ] nearFaces = new Tuple<short, short>[ ] {
+            new Tuple<short, short>(0, 1),
+            new Tuple<short, short>(0, 2),
+            new Tuple<short, short>(0, 3),
+            
+            new Tuple<short, short>(1, 3),
+            new Tuple<short, short>(1, 2),
+            new Tuple<short, short>(2, 3),
+
+            new Tuple<short, short>(4, 1),
+            new Tuple<short, short>(4, 2),
+            new Tuple<short, short>(4, 3),
         };
         Vector3 SphereCameraPosition = new Vector3(10f, 315f, 45f);
 
@@ -78,8 +103,6 @@ namespace CGaG_Lab05 {
             // TODO: Initialization logic
             Effect = new BasicEffect(Graphics.GraphicsDevice);
             Effect.World = Matrix.Identity;
-            Effect.View = ViewMatrix;
-            Effect.Projection = ProjectionMatrix;
             Effect.VertexColorEnabled = true;
 
             base.Initialize( );
@@ -134,7 +157,26 @@ namespace CGaG_Lab05 {
                     new VertexPositionColor(new Vector3(0f, 0f, 1024f), AxesColors[2]),
                     new VertexPositionColor(new Vector3(0f, 0f, -1024f), AxesColors[2]),
                 });
-                this.DrawLineList(Points, Indices);
+                switch (Style) {
+                case DrawingStyle.Lines:
+                    this.DrawLineList(Points, Indices);
+                    break;
+                case DrawingStyle.Edges:
+                    bool[ ] facesVisible = new bool[Faces.Length];
+                    for (uint i = 0; i < facesVisible.Length; i++) {
+                        Vector3 V1 = Points[Faces[i].Item2].Position - Points[Faces[i].Item1].Position;
+                        Vector3 V2 = Points[Faces[i].Item3].Position - Points[Faces[i].Item1].Position;
+                        Vector3 normal = Vector3.Cross(V2, V1);
+                        Vector3 toCam = SimpleUtils.SphereToCart(SphereCameraPosition);
+                        facesVisible[i] = (float)Math.Abs(Math.Acos(Vector3.Dot(normal, toCam) / (normal.Length( ) * toCam.Length( )))) < MathHelper.ToRadians(90f);
+                    }
+                    bool[ ] visibleLines = new bool[nearFaces.Length];
+                    for (uint i = 0; i < nearFaces.Length; i++) {
+                        visibleLines[i] = facesVisible[nearFaces[i].Item1] || facesVisible[nearFaces[i].Item2];
+                    }
+                    this.DrawLineList(Points, Indices, visibleLines);
+                    break;
+                }
             }
 
             base.Draw(Time);

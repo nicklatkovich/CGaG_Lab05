@@ -29,15 +29,15 @@ namespace CGaG_Lab05 {
 
             thread.GraphicsDevice.DrawPrimitives(PrimitiveType.LineList, 0, vertexList.Length / 2);
         }
-/*
-        public static void DrawPrimitive(this Game thread, PrimitiveType type, IVertexType[ ] vertexList, short[ ] indices) {
-            VertexBuffer vertexBuffer = new VertexBuffer(thread.GraphicsDevice, typeof(VertexPositionColor), vertexList.Length, BufferUsage.WriteOnly);
-            vertexBuffer.SetData(vertexList);
-            thread.GraphicsDevice.SetVertexBuffer(vertexBuffer);
+        /*
+                public static void DrawPrimitive(this Game thread, PrimitiveType type, IVertexType[ ] vertexList, short[ ] indices) {
+                    VertexBuffer vertexBuffer = new VertexBuffer(thread.GraphicsDevice, typeof(VertexPositionColor), vertexList.Length, BufferUsage.WriteOnly);
+                    vertexBuffer.SetData(vertexList);
+                    thread.GraphicsDevice.SetVertexBuffer(vertexBuffer);
 
-            thread.GraphicsDevice.DrawUserIndexedPrimitives(type, vertexList, 0, vertexList.Length, indices, 0, indices.Length - 1);
-        }
-        */
+                    thread.GraphicsDevice.DrawUserIndexedPrimitives(type, vertexList, 0, vertexList.Length, indices, 0, indices.Length - 1);
+                }
+                */
         public static void DrawLineList(this Game thread, VertexPositionColor[ ] vertexList, short[ ] indices) {
 
             VertexBuffer vertexBuffer = new VertexBuffer(thread.GraphicsDevice, typeof(VertexPositionColor), vertexList.Length, BufferUsage.WriteOnly);
@@ -45,6 +45,25 @@ namespace CGaG_Lab05 {
             thread.GraphicsDevice.SetVertexBuffer(vertexBuffer);
 
             thread.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.LineList, vertexList, 0, vertexList.Length, indices, 0, indices.Length / 2);
+        }
+
+        public static void DrawLineList(this Game thread, VertexPositionColor[ ] vertexList, short[ ] indices, bool[ ] visibleLines) {
+            uint resultSize = 0;
+            for (uint i = 0; i < visibleLines.Length; i++) {
+                if (visibleLines[i]) {
+                    resultSize++;
+                }
+            }
+            short[ ] result = new short[resultSize * 2];
+            uint pos = 0;
+            for (uint i = 0; i < visibleLines.Length; i++) {
+                if (visibleLines[i]) {
+                    result[pos] = indices[2 * i];
+                    result[pos + 1] = indices[2 * i + 1];
+                    pos += 2;
+                }
+            }
+            thread.DrawLineList(vertexList, result);
         }
 
         public static void DrawLineStrip(this Game thread, VertexPositionColor[ ] vertexList, bool isLooped = false) {
