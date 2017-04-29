@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace CGaG_Lab05 {
     public class MainThread : Game {
@@ -12,18 +13,38 @@ namespace CGaG_Lab05 {
         Matrix ProjectionMatrix;
         BasicEffect Effect;
 
-        float AxesLight = 0.4f;
+        float AxesLight = 0.2f;
+
+        Vector3[ ] Points;
 
         Color[ ] AxesColors;
 
         Color BackColor = new Color(30, 30, 30);
 
         public MainThread( ) {
-            AxesColors = new Color[3] {
+            AxesColors = new Color[ ] {
                 new Color(AxesLight, 0f, 0f),
                 new Color(0f, AxesLight, 0f),
                 new Color(0f, 0f, AxesLight),
             };
+            {
+                float baseSize = 4f;
+                float baseHeight = -2f;
+                float baseDx = baseSize * (float)Math.Cos(MathHelper.ToRadians(30f));
+                float baseDy = baseSize / 2f;
+                float topSize = 2f;
+                float topHeight = 2f;
+                float topDx = topSize * (float)Math.Cos(MathHelper.ToRadians(30f));
+                float topDy = topSize / 2f;
+                Points = new Vector3[ ] {
+                    new Vector3(0f, baseHeight, -baseSize),
+                    new Vector3(baseDx, baseHeight, baseDy),
+                    new Vector3(-baseDx, baseHeight, baseDy),
+                    new Vector3(0f, topHeight, -topSize),
+                    new Vector3(topDx, topHeight, topDy),
+                    new Vector3(-topDx, topHeight, topDy),
+                };
+            }
             Graphics = new GraphicsDeviceManager(this);
             Window.Title = "CGaG Lab 5 by NickLatkovich";
             base.IsMouseVisible = true;
@@ -84,7 +105,42 @@ namespace CGaG_Lab05 {
                     new VertexPositionColor(new Vector3(0f, 0f, 1024f), AxesColors[2]),
                     new VertexPositionColor(new Vector3(0f, 0f, -1024f), AxesColors[2]),
                 });
-                this.DrawLineTriangle(new Vector3(0f, -2f, 0f), new Vector3(2f, 1f, 0f), new Vector3(-2f, 1f, 0f), Color.Blue);
+                {
+                    Color cl = Color.Blue;
+                    VertexPositionColor[ ] vertexes = new VertexPositionColor[ ] {
+                        // base
+                        new VertexPositionColor(Points[0], cl),
+                        new VertexPositionColor(Points[1], cl),
+
+                        new VertexPositionColor(Points[1], cl),
+                        new VertexPositionColor(Points[2], cl),
+
+                        new VertexPositionColor(Points[2], cl),
+                        new VertexPositionColor(Points[0], cl),
+
+                        // side
+                        new VertexPositionColor(Points[0], cl),
+                        new VertexPositionColor(Points[3], cl),
+
+                        new VertexPositionColor(Points[1], cl),
+                        new VertexPositionColor(Points[4], cl),
+
+                        new VertexPositionColor(Points[2], cl),
+                        new VertexPositionColor(Points[5], cl),
+
+                        // top
+                        new VertexPositionColor(Points[3], cl),
+                        new VertexPositionColor(Points[4], cl),
+
+                        new VertexPositionColor(Points[4], cl),
+                        new VertexPositionColor(Points[5], cl),
+
+                        new VertexPositionColor(Points[5], cl),
+                        new VertexPositionColor(Points[3], cl),
+
+                    };
+                    this.DrawLineList(vertexes);
+                }
             }
 
             base.Draw(Time);
