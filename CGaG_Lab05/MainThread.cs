@@ -13,7 +13,7 @@ namespace CGaG_Lab05 {
         Matrix ProjectionMatrix;
         BasicEffect Effect;
 
-        float AxesLight = 0.2f;
+        float AxesLight = 0.7f;
 
         VertexPositionColor[ ] Points;
         short[ ] Indices = new short[ ] {
@@ -33,22 +33,22 @@ namespace CGaG_Lab05 {
         Vector3 SphereCameraPosition = new Vector3(10f, 315f, 45f);
 
         Color[ ] AxesColors;
-        Color PyramidColor = Color.Blue;
+        Color PyramidColor = Color.Black;
 
-        Color BackColor = new Color(30, 30, 30);
+        Color BackColor = new Color(1f, 1f, 1f);
 
         public MainThread( ) {
             AxesColors = new Color[ ] {
-                new Color(AxesLight, 0f, 0f),
-                new Color(0f, AxesLight, 0f),
-                new Color(0f, 0f, AxesLight),
+                new Color(1f, AxesLight, AxesLight),
+                new Color(AxesLight, 1f, AxesLight),
+                new Color(AxesLight, AxesLight, 1f),
             };
             {
                 float baseSize = 3f;
                 float baseHeight = -2f;
                 float baseDx = baseSize * (float)Math.Cos(MathHelper.ToRadians(30f));
                 float baseDy = baseSize / 2f;
-                float topSize = 1.5f;
+                float topSize = 1f;
                 float topHeight = 2f;
                 float topDx = topSize * (float)Math.Cos(MathHelper.ToRadians(30f));
                 float topDy = topSize / 2f;
@@ -62,20 +62,22 @@ namespace CGaG_Lab05 {
                 };
             }
             Graphics = new GraphicsDeviceManager(this);
+            Graphics.PreparingDeviceSettings += SetMultiSampling;
+            //Graphics.PreferMultiSampling = true;
             Window.Title = "CGaG Lab 5 by NickLatkovich";
             base.IsMouseVisible = true;
             Content.RootDirectory = "Content";
 
         }
 
+        private void SetMultiSampling(Object sender, PreparingDeviceSettingsEventArgs e) {
+            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 4;
+        }
+
         protected override void Initialize( ) {
             // TODO: Initialization logic
-            WorldMatrix = Matrix.Identity;
-            ProjectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), GraphicsDevice.Viewport.Width / GraphicsDevice.Viewport.Height, 1.0f, 100.0f);
-
             Effect = new BasicEffect(Graphics.GraphicsDevice);
-
-            Effect.World = WorldMatrix;
+            Effect.World = Matrix.Identity;
             Effect.View = ViewMatrix;
             Effect.Projection = ProjectionMatrix;
             Effect.VertexColorEnabled = true;
@@ -110,6 +112,7 @@ namespace CGaG_Lab05 {
                 (keyboard.IsKeyDown(Keys.Down) ? 1 : 0);
             SimpleUtils.Median(ref SphereCameraPosition.Z, -89f, 89f);
             Effect.View = Matrix.CreateLookAt(SphereCameraPosition.SphereToCart( ), Vector3.Zero, Vector3.Up);
+            Effect.Projection = Matrix.CreateOrthographic(SphereCameraPosition.X, SphereCameraPosition.X * GraphicsDevice.Viewport.Height / GraphicsDevice.Viewport.Width, 0.1f, 100.0f);
 
             base.Update(Time);
         }
