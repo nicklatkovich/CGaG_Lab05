@@ -59,5 +59,13 @@ namespace CGaG_Lab05 {
             thread.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.LineStrip, vertexList, 0, vertexList.Length, indices, 0, indices.Length - 1);
         }
 
+        public static Vector3 SphereToCart(this Vector3 v) {
+            float cos = (float)Math.Cos(MathHelper.ToRadians(v.Z));
+            return v.X * new Vector3(
+                (float)Math.Cos(MathHelper.ToRadians(v.Y)) * cos,
+                (float)Math.Sin(MathHelper.ToRadians(v.Y)) * cos,
+                (float)Math.Sin(MathHelper.ToRadians(v.Z)));
+        }
+
     }
 }

@@ -30,6 +30,7 @@ namespace CGaG_Lab05 {
             4, 5,
             5, 3,
         };
+        Vector3 SphereCameraPosition = new Vector3(10f, 315f, 45f);
 
         Color[ ] AxesColors;
         Color PyramidColor = Color.Blue;
@@ -70,8 +71,6 @@ namespace CGaG_Lab05 {
         protected override void Initialize( ) {
             // TODO: Initialization logic
             WorldMatrix = Matrix.Identity;
-            ViewMatrix = Matrix.CreateLookAt(new Vector3(10f, 10f, 10f), Vector3.Zero, Vector3.Up);
-
             ProjectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), GraphicsDevice.Viewport.Width / GraphicsDevice.Viewport.Height, 1.0f, 100.0f);
 
             Effect = new BasicEffect(Graphics.GraphicsDevice);
@@ -99,6 +98,7 @@ namespace CGaG_Lab05 {
                 Exit( );
 
             // TODO: Update logic
+            Effect.View = Matrix.CreateLookAt(SphereCameraPosition.SphereToCart( ), Vector3.Zero, Vector3.Up);
 
             base.Update(Time);
         }
@@ -120,8 +120,7 @@ namespace CGaG_Lab05 {
                     new VertexPositionColor(new Vector3(0f, 0f, 1024f), AxesColors[2]),
                     new VertexPositionColor(new Vector3(0f, 0f, -1024f), AxesColors[2]),
                 });
-                this.DrawLineList(Points, Indices);
-            }
+                this.DrawLineList(Points, Indices);}
 
             base.Draw(Time);
         }
