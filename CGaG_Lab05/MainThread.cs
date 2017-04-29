@@ -15,9 +15,24 @@ namespace CGaG_Lab05 {
 
         float AxesLight = 0.2f;
 
-        Vector3[ ] Points;
+        VertexPositionColor[ ] Points;
+        short[ ] Indices = new short[ ] {
+            // base
+            0, 1,
+            1, 2,
+            2, 0,
+            // side
+            0, 3,
+            1, 4,
+            2, 5,
+            // top
+            3, 4,
+            4, 5,
+            5, 3,
+        };
 
         Color[ ] AxesColors;
+        Color PyramidColor = Color.Blue;
 
         Color BackColor = new Color(30, 30, 30);
 
@@ -36,13 +51,13 @@ namespace CGaG_Lab05 {
                 float topHeight = 2f;
                 float topDx = topSize * (float)Math.Cos(MathHelper.ToRadians(30f));
                 float topDy = topSize / 2f;
-                Points = new Vector3[ ] {
-                    new Vector3(0f, baseHeight, -baseSize),
-                    new Vector3(baseDx, baseHeight, baseDy),
-                    new Vector3(-baseDx, baseHeight, baseDy),
-                    new Vector3(0f, topHeight, -topSize),
-                    new Vector3(topDx, topHeight, topDy),
-                    new Vector3(-topDx, topHeight, topDy),
+                Points = new VertexPositionColor[ ] {
+                    new VertexPositionColor(new Vector3(0f, baseHeight, -baseSize), PyramidColor),
+                    new VertexPositionColor(new Vector3(baseDx, baseHeight, baseDy), PyramidColor),
+                    new VertexPositionColor(new Vector3(-baseDx, baseHeight, baseDy), PyramidColor),
+                    new VertexPositionColor(new Vector3(0f, topHeight, -topSize), PyramidColor),
+                    new VertexPositionColor(new Vector3(topDx, topHeight, topDy), PyramidColor),
+                    new VertexPositionColor(new Vector3(-topDx, topHeight, topDy), PyramidColor),
                 };
             }
             Graphics = new GraphicsDeviceManager(this);
@@ -105,42 +120,7 @@ namespace CGaG_Lab05 {
                     new VertexPositionColor(new Vector3(0f, 0f, 1024f), AxesColors[2]),
                     new VertexPositionColor(new Vector3(0f, 0f, -1024f), AxesColors[2]),
                 });
-                {
-                    Color cl = Color.Blue;
-                    VertexPositionColor[ ] vertexes = new VertexPositionColor[ ] {
-                        // base
-                        new VertexPositionColor(Points[0], cl),
-                        new VertexPositionColor(Points[1], cl),
-
-                        new VertexPositionColor(Points[1], cl),
-                        new VertexPositionColor(Points[2], cl),
-
-                        new VertexPositionColor(Points[2], cl),
-                        new VertexPositionColor(Points[0], cl),
-
-                        // side
-                        new VertexPositionColor(Points[0], cl),
-                        new VertexPositionColor(Points[3], cl),
-
-                        new VertexPositionColor(Points[1], cl),
-                        new VertexPositionColor(Points[4], cl),
-
-                        new VertexPositionColor(Points[2], cl),
-                        new VertexPositionColor(Points[5], cl),
-
-                        // top
-                        new VertexPositionColor(Points[3], cl),
-                        new VertexPositionColor(Points[4], cl),
-
-                        new VertexPositionColor(Points[4], cl),
-                        new VertexPositionColor(Points[5], cl),
-
-                        new VertexPositionColor(Points[5], cl),
-                        new VertexPositionColor(Points[3], cl),
-
-                    };
-                    this.DrawLineList(vertexes);
-                }
+                this.DrawLineList(Points, Indices);
             }
 
             base.Draw(Time);

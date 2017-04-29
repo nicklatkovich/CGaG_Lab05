@@ -29,6 +29,23 @@ namespace CGaG_Lab05 {
 
             thread.GraphicsDevice.DrawPrimitives(PrimitiveType.LineList, 0, vertexList.Length / 2);
         }
+/*
+        public static void DrawPrimitive(this Game thread, PrimitiveType type, IVertexType[ ] vertexList, short[ ] indices) {
+            VertexBuffer vertexBuffer = new VertexBuffer(thread.GraphicsDevice, typeof(VertexPositionColor), vertexList.Length, BufferUsage.WriteOnly);
+            vertexBuffer.SetData(vertexList);
+            thread.GraphicsDevice.SetVertexBuffer(vertexBuffer);
+
+            thread.GraphicsDevice.DrawUserIndexedPrimitives(type, vertexList, 0, vertexList.Length, indices, 0, indices.Length - 1);
+        }
+        */
+        public static void DrawLineList(this Game thread, VertexPositionColor[ ] vertexList, short[ ] indices) {
+
+            VertexBuffer vertexBuffer = new VertexBuffer(thread.GraphicsDevice, typeof(VertexPositionColor), vertexList.Length, BufferUsage.WriteOnly);
+            vertexBuffer.SetData(vertexList);
+            thread.GraphicsDevice.SetVertexBuffer(vertexBuffer);
+
+            thread.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.LineList, vertexList, 0, vertexList.Length, indices, 0, indices.Length / 2);
+        }
 
         public static void DrawLineStrip(this Game thread, VertexPositionColor[ ] vertexList, bool isLooped = false) {
             short[ ] indices = new short[vertexList.Length + (isLooped ? 1 : 0)];
