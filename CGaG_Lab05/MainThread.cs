@@ -63,6 +63,8 @@ namespace CGaG_Lab05 {
         Color BackColor = new Color(1f, 1f, 1f);
 
         public MainThread( ) {
+            Window.AllowUserResizing = true;
+            Window.ClientSizeChanged += OnWindowResized;
             AxesColors = new Color[ ] {
                 new Color(1f, AxesLight, AxesLight),
                 new Color(AxesLight, 1f, AxesLight),
@@ -93,6 +95,12 @@ namespace CGaG_Lab05 {
             base.IsMouseVisible = true;
             Content.RootDirectory = "Content";
 
+        }
+
+        private void OnWindowResized(Object sender, EventArgs e) {
+            Graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
+            Graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
+            Graphics.ApplyChanges( );
         }
 
         private void SetMultiSampling(Object sender, PreparingDeviceSettingsEventArgs e) {
@@ -135,7 +143,11 @@ namespace CGaG_Lab05 {
                 (keyboard.IsKeyDown(Keys.Down) ? 1 : 0);
             SimpleUtils.Median(ref SphereCameraPosition.Z, -89f, 89f);
             Effect.View = Matrix.CreateLookAt(SphereCameraPosition.SphereToCart( ), Vector3.Zero, Vector3.Up);
-            Effect.Projection = Matrix.CreateOrthographic(SphereCameraPosition.X, SphereCameraPosition.X * GraphicsDevice.Viewport.Height / GraphicsDevice.Viewport.Width, 0.1f, 100.0f);
+            if (Graphics.PreferredBackBufferWidth > Graphics.PreferredBackBufferHeight) {
+                Effect.Projection = Matrix.CreateOrthographic(SphereCameraPosition.X * Graphics.PreferredBackBufferWidth / Graphics.PreferredBackBufferHeight, SphereCameraPosition.X, 0.1f, 100.0f);
+            } else {
+                Effect.Projection = Matrix.CreateOrthographic(SphereCameraPosition.X, SphereCameraPosition.X * Graphics.PreferredBackBufferHeight / Graphics.PreferredBackBufferWidth, 0.1f, 100.0f);
+            }
 
             base.Update(Time);
         }
