@@ -8,14 +8,16 @@ namespace CGaG_Lab05 {
         GraphicsDeviceManager Graphics;
         SpriteBatch SpriteBatch;
 
+        KeyboardState keyboard;
+        KeyboardState keyboardPrev = Keyboard.GetState( );
+
         enum DrawingStyle {
             Lines,
             Edges,
             ColorBases,
-            ColorFaces,
         }
-        DrawingStyle Style = DrawingStyle.Edges;
-        
+        DrawingStyle Style = DrawingStyle.Lines;
+
         BasicEffect Effect;
 
         float AxesLight = 0.7f;
@@ -46,7 +48,7 @@ namespace CGaG_Lab05 {
             new Tuple<short, short>(0, 1),
             new Tuple<short, short>(0, 2),
             new Tuple<short, short>(0, 3),
-            
+
             new Tuple<short, short>(1, 3),
             new Tuple<short, short>(1, 2),
             new Tuple<short, short>(2, 3),
@@ -128,16 +130,26 @@ namespace CGaG_Lab05 {
 
         protected override void Update(GameTime Time) {
 
-            KeyboardState keyboard = Keyboard.GetState( );
+            keyboard = Keyboard.GetState( );
+            if (keyboardPrev == null) {
+                keyboardPrev = keyboard;
+            }
 
             if (keyboard.IsKeyDown(Keys.Escape)) {
                 Exit( );
             }
 
             // TODO: Update logic
+            if (keyboard.IsKeyDown(Keys.D1) && keyboardPrev.IsKeyDown(Keys.D1) == false) {
+                Style = DrawingStyle.Lines;
+            } else if (keyboard.IsKeyDown(Keys.D2) && keyboardPrev.IsKeyDown(Keys.D2) == false) {
+                Style = DrawingStyle.Edges;
+            } else if (keyboard.IsKeyDown(Keys.D3) && keyboardPrev.IsKeyDown(Keys.D3) == false) {
+                Style = DrawingStyle.ColorBases;
+            }
             SphereCameraPosition.Y +=
-                (keyboard.IsKeyDown(Keys.Left) ? 1 : 0) -
-                (keyboard.IsKeyDown(Keys.Right) ? 1 : 0);
+            (keyboard.IsKeyDown(Keys.Left) ? 1 : 0) -
+            (keyboard.IsKeyDown(Keys.Right) ? 1 : 0);
             SphereCameraPosition.Z +=
                 (keyboard.IsKeyDown(Keys.Up) ? 1 : 0) -
                 (keyboard.IsKeyDown(Keys.Down) ? 1 : 0);
@@ -149,6 +161,7 @@ namespace CGaG_Lab05 {
                 Effect.Projection = Matrix.CreateOrthographic(SphereCameraPosition.X, SphereCameraPosition.X * Graphics.PreferredBackBufferHeight / Graphics.PreferredBackBufferWidth, 0.1f, 100.0f);
             }
 
+            keyboardPrev = keyboard;
             base.Update(Time);
         }
 
@@ -169,23 +182,26 @@ namespace CGaG_Lab05 {
                     new VertexPositionColor(new Vector3(0f, 0f, 1024f), AxesColors[2]),
                     new VertexPositionColor(new Vector3(0f, 0f, -1024f), AxesColors[2]),
                 });
+                bool[ ] facesVisible = new bool[Faces.Length];
+                for (uint i = 0; i < facesVisible.Length; i++) {
+                    Vector3 V1 = Points[Faces[i].Item2].Position - Points[Faces[i].Item1].Position;
+                    Vector3 V2 = Points[Faces[i].Item3].Position - Points[Faces[i].Item1].Position;
+                    Vector3 normal = Vector3.Cross(V2, V1);
+                    Vector3 toCam = SimpleUtils.SphereToCart(SphereCameraPosition);
+                    facesVisible[i] = (float)Math.Abs(Math.Acos(Vector3.Dot(normal, toCam) / (normal.Length( ) * toCam.Length( )))) < MathHelper.ToRadians(90f);
+                }
+                bool[ ] visibleLines = new bool[nearFaces.Length];
+                for (uint i = 0; i < nearFaces.Length; i++) {
+                    visibleLines[i] = facesVisible[nearFaces[i].Item1] || facesVisible[nearFaces[i].Item2];
+                }
                 switch (Style) {
                 case DrawingStyle.Lines:
                     this.DrawLineList(Points, Indices);
                     break;
                 case DrawingStyle.Edges:
-                    bool[ ] facesVisible = new bool[Faces.Length];
-                    for (uint i = 0; i < facesVisible.Length; i++) {
-                        Vector3 V1 = Points[Faces[i].Item2].Position - Points[Faces[i].Item1].Position;
-                        Vector3 V2 = Points[Faces[i].Item3].Position - Points[Faces[i].Item1].Position;
-                        Vector3 normal = Vector3.Cross(V2, V1);
-                        Vector3 toCam = SimpleUtils.SphereToCart(SphereCameraPosition);
-                        facesVisible[i] = (float)Math.Abs(Math.Acos(Vector3.Dot(normal, toCam) / (normal.Length( ) * toCam.Length( )))) < MathHelper.ToRadians(90f);
-                    }
-                    bool[ ] visibleLines = new bool[nearFaces.Length];
-                    for (uint i = 0; i < nearFaces.Length; i++) {
-                        visibleLines[i] = facesVisible[nearFaces[i].Item1] || facesVisible[nearFaces[i].Item2];
-                    }
+                    this.DrawLineList(Points, Indices, visibleLines);
+                    break;
+                case DrawingStyle.ColorBases:
                     this.DrawLineList(Points, Indices, visibleLines);
                     if (facesVisible[0]) {
                         this.DrawTriangle(Points[0].Position, Points[1].Position, Points[2].Position, Color.Red);
@@ -199,5 +215,6 @@ namespace CGaG_Lab05 {
 
             base.Draw(Time);
         }
+
     }
 }
