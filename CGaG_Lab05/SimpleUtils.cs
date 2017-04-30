@@ -17,6 +17,24 @@ namespace CGaG_Lab05 {
             thread.DrawLineStrip(points, true);
         }
 
+        public static void DrawTriangle(this Game thread, Vector3 pos1, Vector3 pos2, Vector3 pos3, Color color) {
+            VertexPositionColor[ ] vertexList = new VertexPositionColor[ ] {
+                new VertexPositionColor(pos1, color),
+                new VertexPositionColor(pos2, color),
+                new VertexPositionColor(pos3, color),
+            };
+            short[ ] indices = new short[3];
+            for (short i = 0; i < 3; i++) {
+                indices[i] = i;
+            }
+
+            VertexBuffer vertexBuffer = new VertexBuffer(thread.GraphicsDevice, typeof(VertexPositionColor), vertexList.Length, BufferUsage.WriteOnly);
+            vertexBuffer.SetData(vertexList);
+            thread.GraphicsDevice.SetVertexBuffer(vertexBuffer);
+
+            thread.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, vertexList.Length / 2);
+        }
+
         public static void DrawLineList(this Game thread, VertexPositionColor[ ] vertexList) {
             short[ ] indices = new short[vertexList.Length];
             for (short i = 0; i < vertexList.Length; i++) {

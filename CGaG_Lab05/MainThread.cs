@@ -187,6 +187,12 @@ namespace CGaG_Lab05 {
                         visibleLines[i] = facesVisible[nearFaces[i].Item1] || facesVisible[nearFaces[i].Item2];
                     }
                     this.DrawLineList(Points, Indices, visibleLines);
+                    if (facesVisible[0]) {
+                        this.DrawTriangle(Points[0].Position, Points[1].Position, Points[2].Position, Color.Red);
+                    }
+                    if (facesVisible[4]) {
+                        this.DrawTriangle(Points[3].Position, Points[4].Position, Points[5].Position, Color.Blue);
+                    }
                     break;
                 }
             }
